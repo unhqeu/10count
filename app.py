@@ -335,6 +335,6 @@ html_code = r"""
 
 components.html(
     html_code,
-    height=900,
+    height=650,
     scrolling=True
 )
