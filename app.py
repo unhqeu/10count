@@ -9,6 +9,7 @@ st.set_page_config(
 
 html_code = r"""
 
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -24,9 +25,9 @@ html_code = r"""
     body {
       margin: 0;
       min-height: 100vh;
-      background: #10131c;
-      color: white;
-      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #29466f;
+      font-family: Arial, "Malgun Gothic", sans-serif;
       user-select: none;
     }
 
@@ -43,9 +44,10 @@ html_code = r"""
     }
 
     h1 {
-      font-size: 26px;
-      color: #aeb8d0;
-      margin-bottom: 18px;
+      font-size: clamp(24px, 5vw, 36px);
+      font-weight: 800;
+      color: #29466f;
+      margin: 0 0 20px;
     }
 
     .timer {
@@ -53,8 +55,8 @@ html_code = r"""
       font-weight: bold;
       font-variant-numeric: tabular-nums;
       letter-spacing: -3px;
-      color: #ffffff;
-      margin: 20px 0;
+      color: #315784;
+      margin: 12px 0 20px;
     }
 
     /* 5초가 지나면 타이머 숫자 숨기기 */
@@ -63,52 +65,74 @@ html_code = r"""
     }
 
     .message {
-      font-size: 17px;
-      color: #9da8c0;
-      line-height: 1.8;
+      font-size: clamp(15px, 3vw, 18px);
+      color: #58749b;
+      line-height: 1.9;
+      background: #f0f6ff;
+      border-radius: 24px;
+      padding: 18px 28px;
+      width: min(100%, 600px);
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .result {
       display: none;
-      margin-top: 22px;
+      width: min(100%, 400px);
+      margin-top: 24px;
+      padding: 24px;
+      border: 2px solid #e0edff;
+      border-radius: 24px;
+      background: #ffffff;
     }
 
     .final-time {
       font-size: 22px;
-      color: #ffffff;
-      margin-bottom: 12px;
+      font-weight: bold;
+      color: #315784;
+      margin-bottom: 20px;
     }
 
     .result-label {
       font-size: 16px;
-      color: #aeb8d0;
-      margin-bottom: 8px;
+      color: #7189a9;
+      margin-bottom: 10px;
     }
 
     .error {
-      font-size: 34px;
+      font-size: clamp(28px, 7vw, 36px);
       font-weight: bold;
-      color: #66e3b4;
+      color: #20b695;
       margin: 10px 0 24px;
     }
 
     button {
       cursor: pointer;
       border: none;
-      border-radius: 12px;
-      padding: 14px 38px;
-      background: #6c7cff;
+      border-radius: 14px;
+      padding: 15px 36px;
+      width: 100%;
+      max-width: 260px;
+      background: #4d8cf5;
       color: white;
       font-size: 18px;
       font-weight: bold;
+      transition: background 0.2s, transform 0.2s;
     }
 
     button:hover {
-      background: #8491ff;
+      background: #3677e8;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: scale(0.98);
     }
 
     .game.running .timer {
-      color: #7cddff;
+      color: #4d8cf5;
     }
 
     .game.finished {
@@ -117,8 +141,24 @@ html_code = r"""
 
     .target {
       font-size: 14px;
-      color: #68748e;
-      margin-top: 28px;
+      font-weight: bold;
+      color: #8499b8;
+      margin-top: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .game {
+        padding: 20px;
+      }
+
+      .message {
+        padding: 16px;
+      }
+
+      .result {
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -131,15 +171,16 @@ html_code = r"""
     <div class="timer" id="timer">0.000</div>
 
     <div class="message" id="message">
-      화면을 클릭해서 시작하세요.<br>
-      5초가 지나면 타이머가 사라집니다!<br>
-      속으로 시간을 세다가 10초에 맞춰 클릭하세요.
+      <div>화면을 클릭해서 시작하세요.</div>
+      <div>5초가 지나면 타이머가 사라집니다!</div>
+      <div>속으로 시간을 세다가 10초에 맞춰 클릭하세요.</div>
     </div>
 
     <div class="result" id="result">
 
       <div class="final-time">
-        측정 시간: <span id="finalTime">0.000</span>초
+        <div class="result-label">측정 시간</div>
+        <span id="finalTime">0.000</span>초
       </div>
 
       <div class="result-label">
@@ -184,12 +225,11 @@ html_code = r"""
 
       timer.textContent = formatTime(elapsed);
 
-      // 5.000초가 되면 숫자 숨기기
+      // 5초가 지나면 숫자 숨기기
       if (elapsed >= HIDE_TIME) {
         timer.classList.add("hidden");
       }
 
-      // 숫자가 숨겨져도 측정은 계속 진행
       animationId = requestAnimationFrame(updateTimer);
     }
 
@@ -204,17 +244,16 @@ html_code = r"""
       game.classList.add("running");
 
       message.innerHTML =
-        "타이머가 시작되었습니다!<br>" +
-        "5초 이후에는 속으로 시간을 세어 보세요.";
+        "<div>타이머가 시작되었습니다!</div>" +
+        "<div>5초 이후에는 속으로 시간을 세어 보세요.</div>";
 
       result.style.display = "none";
 
       updateTimer();
     }
 
-    // 타이머 정지 및 결과 계산
+    // 게임 종료 및 결과 계산
     function stopGame() {
-      // 실제 경과 시간을 정밀하게 측정
       const elapsed = (performance.now() - startTime) / 1000;
       const difference = Math.abs(elapsed - TARGET);
 
@@ -222,7 +261,6 @@ html_code = r"""
 
       cancelAnimationFrame(animationId);
 
-      // 최종 결과를 보여주기 위해 숫자 다시 표시
       timer.classList.remove("hidden");
       timer.textContent = formatTime(elapsed);
 
@@ -242,11 +280,11 @@ html_code = r"""
 
       // 오차에 따라 색상 변경
       if (difference < 0.050) {
-        error.style.color = "#66e3b4";
+        error.style.color = "#20b695";
       } else if (difference < 0.200) {
-        error.style.color = "#ffd166";
+        error.style.color = "#e5a52e";
       } else {
-        error.style.color = "#ff7676";
+        error.style.color = "#ed6b75";
       }
 
       game.classList.remove("running");
@@ -255,9 +293,8 @@ html_code = r"""
       result.style.display = "block";
     }
 
-    // 화면 클릭으로 시작하거나 정지
+    // 화면을 클릭해서 시작하거나 정지
     game.addEventListener("click", (event) => {
-      // 버튼 클릭은 게임 화면 클릭으로 처리하지 않음
       if (event.target.closest("button")) return;
 
       if (state === "ready") {
@@ -267,7 +304,7 @@ html_code = r"""
       }
     });
 
-    // 다시 하기 버튼
+    // 다시 하기
     restart.addEventListener("click", () => {
       cancelAnimationFrame(animationId);
 
@@ -278,13 +315,13 @@ html_code = r"""
       timer.classList.remove("hidden");
 
       message.innerHTML =
-        "화면을 클릭해서 시작하세요.<br>" +
-        "5초가 지나면 타이머가 사라집니다!<br>" +
-        "속으로 시간을 세다가 10초에 맞춰 클릭하세요.";
+        "<div>화면을 클릭해서 시작하세요.</div>" +
+        "<div>5초가 지나면 타이머가 사라집니다!</div>" +
+        "<div>속으로 시간을 세다가 10초에 맞춰 클릭하세요.</div>";
 
       finalTime.textContent = "0.000";
       error.textContent = "0.000초";
-      error.style.color = "#66e3b4";
+      error.style.color = "#20b695";
 
       result.style.display = "none";
 
@@ -293,7 +330,7 @@ html_code = r"""
   </script>
 </body>
 </html>
-
+```
 """
 
 components.html(
