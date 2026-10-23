@@ -1,4 +1,3 @@
-
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -8,308 +7,353 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Streamlit 기본 여백 최소화
 st.markdown("""
-<style>
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-
-    header, footer {
-        visibility: hidden;
-    }
-
-    iframe {
-        width: 100%;
-        border: none;
-    }
-</style>
+    <style>
+        .block-container {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            max-width: 100%;
+        }
+        header {
+            visibility: hidden;
+        }
+        footer {
+            visibility: hidden;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
 html_code = r"""
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10초 타이머 게임</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f5f5f5;
-}
-
-h1 {
-    margin: 12px 0 8px;
-    font-size: clamp(22px, 3vw, 30px);
-}
-
-.description {
-    margin: 0 10px 12px;
-    font-size: 15px;
-}
-
-.container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 0;
-    padding: 10px;
-    margin: 0 auto;
-}
-
-.game-area {
-    width: min(70vw, 680px);
-    text-align: center;
-}
-
-#game {
-    width: 100%;
-    height: clamp(230px, 42vh, 340px);
-    margin: 0 auto 15px;
-    background-color: #d93636;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 15px;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-}
-
-#game.green {
-    background-color: #16a34a;
-}
-
-button {
-    padding: 12px 30px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    background-color: #333333;
-    color: white;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-button:disabled {
-    background-color: #999999;
-    cursor: not-allowed;
-}
-
-#results {
-    position: absolute;
-    left: calc(50% + min(35vw, 340px) + 15px);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 190px;
-    padding: 12px;
-    background-color: white;
-    border-radius: 12px;
-    font-size: 16px;
-    line-height: 1.5;
-    text-align: left;
-    overflow-wrap: break-word;
-}
-
-#results h3 {
-    margin-top: 0;
-}
-
-#results h2 {
-    font-size: 20px;
-}
-
-@media (max-width: 900px) {
-    .container {
-        flex-direction: column;
-        gap: 16px;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    .game-area {
-        width: 100%;
-        max-width: 680px;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #ffffff;
+      color: #29466f;
+      font-family: Arial, "Malgun Gothic", sans-serif;
+      user-select: none;
     }
 
-    #game {
-        height: clamp(220px, 35vh, 300px);
+    .game {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
     }
 
-    #results {
-        position: static;
-        transform: none;
-        width: 100%;
-        max-width: 680px;
+    h1 {
+      font-size: clamp(24px, 5vw, 36px);
+      font-weight: 800;
+      color: #29466f;
+      margin: 0 0 20px;
     }
-}
-</style>
+
+    .timer {
+      font-size: clamp(64px, 16vw, 120px);
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -3px;
+      color: #315784;
+      margin: 12px 0 20px;
+    }
+
+    /* 5초가 지나면 타이머 숫자 숨기기 */
+    .timer.hidden {
+      visibility: hidden;
+    }
+
+    .message {
+      font-size: clamp(15px, 3vw, 18px);
+      color: #58749b;
+      line-height: 1.9;
+      background: #f0f6ff;
+      border-radius: 24px;
+      padding: 18px 28px;
+      width: min(100%, 600px);
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .result {
+      display: none;
+      width: min(100%, 400px);
+      margin-top: 24px;
+      padding: 24px;
+      border: 2px solid #e0edff;
+      border-radius: 24px;
+      background: #ffffff;
+    }
+
+    .final-time {
+      font-size: 22px;
+      font-weight: bold;
+      color: #315784;
+      margin-bottom: 20px;
+    }
+
+    .result-label {
+      font-size: 16px;
+      color: #7189a9;
+      margin-bottom: 10px;
+    }
+
+    .error {
+      font-size: clamp(28px, 7vw, 36px);
+      font-weight: bold;
+      color: #20b695;
+      margin: 10px 0 24px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 14px;
+      padding: 15px 36px;
+      width: 100%;
+      max-width: 260px;
+      background: #4d8cf5;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #3677e8;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .game.running .timer {
+      color: #4d8cf5;
+    }
+
+    .game.finished {
+      cursor: default;
+    }
+
+    .target {
+      font-size: 14px;
+      font-weight: bold;
+      color: #8499b8;
+      margin-top: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .game {
+        padding: 20px;
+      }
+
+      .message {
+        padding: 16px;
+      }
+
+      .result {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <main class="game" id="game">
 
-<h1>반응속도 테스트</h1>
-<p class="description">
-    초록색으로 바뀌면 최대한 빠르게 클릭하세요!
-</p>
+    <h1>10초 타이머 게임</h1>
 
-<div class="container">
+    <div class="timer" id="timer">0.000</div>
 
-    <div class="game-area">
-        <div id="game">시작 버튼을 누르세요</div>
-        <button id="startBtn">시작</button>
+    <div class="message" id="message">
+      <div>화면을 클릭해서 시작하세요.</div>
+      <div>5초가 지나면 타이머가 사라집니다!</div>
+      <div>속으로 시간을 세다가 10초에 맞춰 클릭하세요.</div>
     </div>
 
-    <div id="results">
-        <p>반응속도 기록이 여기에 표시됩니다.</p>
+    <div class="result" id="result">
+
+      <div class="final-time">
+        <div class="result-label">측정 시간</div>
+        <span id="finalTime">0.000</span>초
+      </div>
+
+      <div class="result-label">
+        10.000초와의 오차
+      </div>
+
+      <div class="error" id="error">0.000초</div>
+
+      <button id="restart">다시 하기</button>
     </div>
 
-</div>
+    <div class="target">TARGET · 10.000 SEC</div>
 
-<script>
-const game = document.querySelector("#game");
-const startBtn = document.querySelector("#startBtn");
-const results = document.querySelector("#results");
+  </main>
 
-let count = 0;
-let times = [];
-let startTime = 0;
-let timer;
-let phase = "ready";
+  <script>
+    const game = document.getElementById("game");
+    const timer = document.getElementById("timer");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const finalTime = document.getElementById("finalTime");
+    const error = document.getElementById("error");
+    const restart = document.getElementById("restart");
 
-startBtn.addEventListener("click", startGame);
+    const TARGET = 10.000;
+    const HIDE_TIME = 5.000;
 
-function startGame() {
-    clearTimeout(timer);
+    let startTime = 0;
+    let animationId = null;
+    let state = "ready";
 
-    count = 0;
-    times = [];
-    phase = "countdown";
-
-    startBtn.disabled = true;
-    results.innerHTML = "<p>반응속도 측정 중...</p>";
-
-    countdown(3);
-}
-
-function countdown(number) {
-    game.classList.remove("green");
-    game.textContent = number;
-
-    if (number > 1) {
-        timer = setTimeout(function() {
-            countdown(number - 1);
-        }, 1000);
-    } else {
-        timer = setTimeout(function() {
-            startRound();
-        }, 1000);
+    // 소수점 셋째 자리까지 표시
+    function formatTime(seconds) {
+      return seconds.toFixed(3);
     }
-}
 
-function startRound() {
-    phase = "waiting";
-    game.classList.remove("green");
-    game.textContent = "";
+    // 타이머 업데이트
+    function updateTimer() {
+      if (state !== "running") return;
 
-    const randomTime = 2000 + Math.random() * 3000;
+      const elapsed = (performance.now() - startTime) / 1000;
 
-    timer = setTimeout(function() {
-        phase = "green";
-        game.classList.add("green");
-        game.textContent = "";
-        startTime = performance.now();
-    }, randomTime);
-}
+      timer.textContent = formatTime(elapsed);
 
-game.addEventListener("click", function() {
-    if (phase === "waiting") {
-        clearTimeout(timer);
-        phase = "falseStart";
-        game.textContent = "너무 빨라요! 다시 시도하세요.";
+      // 5초가 지나면 숫자 숨기기
+      if (elapsed >= HIDE_TIME) {
+        timer.classList.add("hidden");
+      }
 
-        timer = setTimeout(function() {
-            startRound();
-        }, 1000);
-
-    } else if (phase === "green") {
-        const reactionTime = performance.now() - startTime;
-
-        times.push(reactionTime);
-        count++;
-
-        phase = "recorded";
-
-        game.textContent =
-            (reactionTime / 1000).toFixed(3) + "초";
-
-        updateResults();
-
-        timer = setTimeout(function() {
-            game.classList.remove("green");
-
-            if (count < 3) {
-                startRound();
-            } else {
-                finishGame();
-            }
-        }, 2000);
+      animationId = requestAnimationFrame(updateTimer);
     }
-});
 
-function updateResults() {
-    results.innerHTML = "<h3>반응속도 기록</h3>";
+    // 게임 시작
+    function startGame() {
+      state = "running";
+      startTime = performance.now();
 
-    for (let i = 0; i < times.length; i++) {
-        results.innerHTML +=
-            "<p>" + (i + 1) + "회차: " +
-            (times[i] / 1000).toFixed(3) +
-            "초</p>";
+      timer.textContent = "0.000";
+      timer.classList.remove("hidden");
+
+      game.classList.add("running");
+
+      message.innerHTML =
+        "<div>타이머가 시작되었습니다!</div>" +
+        "<div>5초 이후에는 속으로 시간을 세어 보세요.</div>";
+
+      result.style.display = "none";
+
+      updateTimer();
     }
-}
 
-function finishGame() {
-    phase = "finished";
+    // 게임 종료 및 결과 계산
+    function stopGame() {
+      const elapsed = (performance.now() - startTime) / 1000;
+      const difference = Math.abs(elapsed - TARGET);
 
-    const total = times.reduce(function(sum, time) {
-        return sum + time;
-    }, 0);
+      state = "finished";
 
-    const average = total / times.length;
+      cancelAnimationFrame(animationId);
 
-    game.classList.add("green");
-    game.textContent = "테스트 완료!";
+      timer.classList.remove("hidden");
+      timer.textContent = formatTime(elapsed);
 
-    results.innerHTML +=
-        "<h2>평균: " +
-        (average / 1000).toFixed(3) +
-        "초</h2>";
+      finalTime.textContent = formatTime(elapsed);
+      error.textContent = formatTime(difference) + "초";
 
-    startBtn.disabled = false;
-    startBtn.textContent = "다시 시작";
-}
-</script>
+      // 결과 메시지
+      if (difference < 0.0005) {
+        message.textContent = "완벽합니다! 정확히 10초입니다!";
+      } else if (difference < 0.050) {
+        message.textContent = "대단해요! 거의 정확합니다!";
+      } else if (elapsed < TARGET) {
+        message.textContent = "조금 빨랐어요!";
+      } else {
+        message.textContent = "조금 늦었어요!";
+      }
 
+      // 오차에 따라 색상 변경
+      if (difference < 0.050) {
+        error.style.color = "#20b695";
+      } else if (difference < 0.200) {
+        error.style.color = "#e5a52e";
+      } else {
+        error.style.color = "#ed6b75";
+      }
+
+      game.classList.remove("running");
+      game.classList.add("finished");
+
+      result.style.display = "block";
+    }
+
+    // 화면을 클릭해서 시작하거나 정지
+    game.addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+
+      if (state === "ready") {
+        startGame();
+      } else if (state === "running") {
+        stopGame();
+      }
+    });
+
+    // 다시 하기
+    restart.addEventListener("click", () => {
+      cancelAnimationFrame(animationId);
+
+      state = "ready";
+      startTime = 0;
+
+      timer.textContent = "0.000";
+      timer.classList.remove("hidden");
+
+      message.innerHTML =
+        "<div>화면을 클릭해서 시작하세요.</div>" +
+        "<div>5초가 지나면 타이머가 사라집니다!</div>" +
+        "<div>속으로 시간을 세다가 10초에 맞춰 클릭하세요.</div>";
+
+      finalTime.textContent = "0.000";
+      error.textContent = "0.000초";
+      error.style.color = "#20b695";
+
+      result.style.display = "none";
+
+      game.classList.remove("running", "finished");
+    });
+  </script>
 </body>
 </html>
+```
 """
 
 components.html(
     html_code,
-    height=850,
+    height=650,
     scrolling=True
 )
