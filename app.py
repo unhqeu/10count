@@ -1,11 +1,30 @@
-
 import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="10초 맞추기",
-    layout="wide"
+    page_title="반응속도 테스트",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+
+# Streamlit 기본 여백 최소화
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            max-width: 100%;
+        }
+        header {
+            visibility: hidden;
+        }
+        footer {
+            visibility: hidden;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 html_code = r"""
 
